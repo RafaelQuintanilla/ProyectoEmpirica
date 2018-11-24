@@ -1,4 +1,4 @@
-package finalEmpirica;
+package alan;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -12,7 +12,7 @@ import org.jgrapht.traverse.*;
 public class PrimeroMejorRam {
 
 	public static void main(String[] args) {
-		Graph<Integer, DefaultWeightedEdge> grafo = crearGrafo();
+		//Graph<Integer, DefaultWeightedEdge> grafo = crearGrafo();
 		/*
 
 		  System.out.println(grafo.toString());
@@ -303,7 +303,7 @@ public class PrimeroMejorRam {
 		return IntegerPredecesor;
 	}
 
-	private static void primeroMejor(Graph<Integer, DefaultWeightedEdge> grafo , Integer inicio , Integer llegada) {
+	public static void primeroMejor(Graph<Integer, DefaultWeightedEdge> grafo , Integer inicio , Integer llegada) {
 		
 		List<Integer> visitados = new ArrayList<>();
 		List<Integer> sucesores = new ArrayList<>();
@@ -321,7 +321,14 @@ public class PrimeroMejorRam {
 				visitados.add(IntegerActual); //AGREGO a la lista de visitados por donde comienzo
 			}else {// Ya tengo el Integer donde empezar
 				sucesores = Graphs.successorListOf(grafo, IntegerActual); //VEO si el Integer tiene sucesores
+				
 				if(sucesores.isEmpty() == false){    //SI encontramos Integers sucesores 
+					if(!verificarTodosSucesoresVisitados(visitados, sucesores)){ //reviso todos los hijos si estan en la lista de visitados
+						IntegerActual = obtenerIntegerPredecesorVisitado(IntegerActual, Graphs.predecessorListOf(grafo,IntegerActual), visitados); 
+					}else if(IntegerActual == inicio){
+						System.out.println("Esta mierda no encontro nada");
+						break;
+					}
 					IntegerAux = IntegerActual;
 					IntegerActual = obtenerIntegerMayorEuristica(IntegerActual, sucesores,visitados);//agarro el Integer con mejor Euristica
 					if(IntegerActual != null && IntegerActual == llegada  ) {
@@ -351,7 +358,7 @@ public class PrimeroMejorRam {
 
 						if(IntegerActual == null){//Si busco los sucesores y no hay ninguno, vuelvo a retroceder a un predecesor
 							IntegerActual = obtenerIntegerPredecesorVisitado(IntegerAux, Graphs.predecessorListOf(grafo,IntegerAux), visitados);
-							if(visitados.size() == grafo.vertexSet().size()){//Si la lista de visitados es la misma que la cant de Integers, no hay solucion
+							if(visitados.size() == grafo.vertexSet().size() || inicio == IntegerActual){//Si la lista de visitados es la misma que la cant de Integers, no hay solucion
 								System.out.println("No se encontro una posible solucion");
 								terminado = true;
 							}
@@ -371,6 +378,16 @@ public class PrimeroMejorRam {
 				}
 			}
 		}
+	}
+	
+	private static boolean verificarTodosSucesoresVisitados(List<Integer> visitados, List<Integer> sucesores){
+		boolean todosVisitados = true;
+		for(int i=0;i<sucesores.size();i++){
+			if(!visitados.contains(sucesores.get(i))){
+				todosVisitados = false;
+			}
+		}
+		return todosVisitados;
 	}
 
 	public static Graph<Integer, DefaultWeightedEdge> GenerateRandomGraph(List<Integer> vertexes )
